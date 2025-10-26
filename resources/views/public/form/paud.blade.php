@@ -5,7 +5,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-8 col-12 mx-auto">
-                        <h1 class="text-white text-center">SARPAS TK</h1>
+                        <h1 class="text-white text-center">{{ $title }}</h1>
                     </div>
                 </div>
             </div>
@@ -15,14 +15,14 @@
             <div class="card col-lg-10 shadow">
                 <div class="card-title">
                     <div class="text-center pt-5">
-                        <h5 class="fs-0">FASILITASI PENCAPAIAN STANDAR PELAYANAN MINIMAL(SPM) TK</h5>
+                        <h5 class="fs-0">FASILITASI PENCAPAIAN {{ $title }}</h5>
                     </div>
                 </div>
                 <hr>
-                <form id="form-tk" class="needs-validation" novalidate action="{{ route('sarpas.tk') }}" method="post" autocomplete="off">
+                <form id="form-tk" class="needs-validation" novalidate action="{{ url('/sarpas/save?spm='.$spm_level_id) }}" method="post" autocomplete="off">
                     @csrf
 
-                    <input name="spm_level_id" type="hidden" value="SPM_TK">
+                    <input name="spm_level_id" type="hidden" value="{{ $spm_level_id }}">
 
                     <div class="row gx-2">
                         <div class="col-lg-12 col-md-9 p-5">
@@ -138,9 +138,9 @@
                                     <div class="col">
                                         <select id="accreditation" name="accreditation" class="form-control" required>
                                             <option value="">-- Belum --</option>
-                                            <option value="A">Akreditasi A</option>
-                                            <option value="B">Akreditasi B</option>
-                                            <option value="C">Akreditasi C</option>
+                                            <option value="A" {{ old('accreditation') == 'A' ? 'selected' : '' }}>Akreditasi A</option>
+                                            <option value="B" {{ old('accreditation') == 'B' ? 'selected' : '' }}>Akreditasi B</option>
+                                            <option value="C" {{ old('accreditation') == 'C' ? 'selected' : '' }}>Akreditasi C</option>
                                         </select>
                                         @error('accreditation')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -221,7 +221,7 @@
                                 <div class="col">
                                     <label class="col-form-label text-capitalize" for="address_detail">Detail RT/RW, Jalan, Dusun, Kode Pos</label>
                                     <div class="col">
-                                        <textarea id="address_detail" name="address_detail" type="text" class="form-control @error('address_detail') is-invalid @enderror" required placeholder="Alamat Detail" value="{{ old('address_detail') }}"></textarea>
+                                        <textarea id="address_detail" name="address_detail" type="text" class="form-control @error('address_detail') is-invalid @enderror" required placeholder="Alamat Detail">{{ old('address_detail') }}</textarea>
                                         @error('address_detail')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -294,10 +294,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const schoolNameInput = document.getElementById('school_name');
-            const schoolIdInput = document.querySelector('input[name="school_id"]');
-            const schoolNpsnInput = document.getElementById('school_npsn');
-            const headmasterNameInput = document.getElementById('headmaster_name');
-            const headmasterNipInput = document.getElementById('headmaster_nip');
             const loadingSpinner = document.getElementById('school_search_loading');
             
             let searchTimeout;
@@ -310,6 +306,7 @@
             schoolNameInput.parentNode.appendChild(resultsDropdown);
 
             schoolNameInput.addEventListener('input', function(e) {
+                document.querySelector('input[name="school_id"]').value = '';
                 clearTimeout(searchTimeout);
                 const query = e.target.value.trim();
                 
@@ -326,7 +323,8 @@
             });
 
             function fetchSchools(query) {
-                fetch(`/api/history/school/byname?q=${encodeURIComponent(query)}`)
+                const spm_level_id = document.querySelector('input[name="spm_level_id"]').value;
+                fetch(`/api/history/school/byname?q=${encodeURIComponent(query)}&spm=${spm_level_id}`)
                     .then(response => response.json())
                     .then(data => {
                         loadingSpinner.classList.add('d-none');
@@ -375,10 +373,24 @@
             function selectSchool(school) {
                 // Fill form fields with school data
                 schoolNameInput.value = school.name;
-                schoolIdInput.value = school.school_id;
-                schoolNpsnInput.value = school.NPSN || '';
-                headmasterNameInput.value = school.headmaster_name || '';
-                headmasterNipInput.value = school.headmaster_nip || '';
+                document.querySelector('input[name="school_id"]').value = school.school_id;
+                document.getElementById('school_npsn').value = school.NPSN || '';
+                document.getElementById('headmaster_name').value = school.headmaster_name;
+                document.getElementById('headmaster_nip').value = school.headmaster_nip || '';
+                document.getElementById('teacher_count').value = school.teacher_count || '0';
+				document.getElementById('kualifikasi_count_S3').value = school.teacher_s3_count || '0';
+				document.getElementById('kualifikasi_count_S2').value = school.teacher_s2_count || '0';
+				document.getElementById('kualifikasi_count_S1').value = school.teacher_s1_count || '0';
+				document.getElementById('kualifikasi_count_Diploma').value = school.teacher_dipl_count || '0';
+				document.getElementById('kualifikasi_count_SMA').value = school.teacher_sma_count || '0';
+				document.getElementById('kualifikasi_count_SMP').value = school.teacher_smp_count || '0';
+				document.getElementById('kualifikasi_count_SD').value = school.teacher_sd_count || '0';
+				document.getElementById('rombel_a').value = school.rombel_a_count || '0';
+				document.getElementById('rombel_b').value = school.rombel_b_count || '0';
+				document.getElementById('student_count').value = school.student_count || '0';
+                document.getElementById('accreditation').value = school.accreditation || '';
+                document.getElementById('address_village').value = school.address_village_code || '';
+                document.getElementById('address_detail').value = school.address || '';
                 
                 hideResults();
                 

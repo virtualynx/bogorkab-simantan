@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [SPMController::class, 'index'])->name('/');
 
 Route::prefix('sarpas')->group(function () {
+    Route::get('/view', [SPMController::class, 'sarpasPAUD']);
+    Route::post('/save', [SPMController::class, 'savePAUD']);
+
     Route::get('/tk', [SPMController::class, 'sarpasTK'])->name('sarpas.tk');
     Route::post('/tk', [SPMController::class, 'storeTK'])->name('sarpas.tk');
 

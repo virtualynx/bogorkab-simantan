@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Api\HistoryApi;
 use App\Http\Api\WilayahApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,9 @@ Route::prefix('wilayah')->group(function () {
     Route::get('/regencies/{provinceCode}', [WilayahApi::class, 'regencies']);
     Route::get('/districts/{regencyCode}', [WilayahApi::class, 'districts']);
     Route::get('/villages/{districtCode}', [WilayahApi::class, 'villages']);
+});
+
+Route::prefix('history')->group(function () {
+    Route::get('/school/byname', [HistoryApi::class, 'getSchoolByName']);
+    Route::get('/checkanswer/by_schoolname', [HistoryApi::class, 'checkAnswerBySchoolName']);
 });
