@@ -138,7 +138,7 @@
                                         Sarpas Dasar
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ url('/sarpas/sd') }}">Sarpas SD Test</a></li>
+                                        {{-- <li><a class="dropdown-item" href="{{ url('/sarpas/sd') }}">Sarpas SD Test</a></li> --}}
                                         <li><a class="dropdown-item" href="{{ url('/sarpas/dasar_view?spm=SPM_SD') }}">Sarpas SD</a></li>
                                         <li><a class="dropdown-item" href="{{ url('/sarpas/dasar_view?spm=SPM_SMP') }}">Sarpas SMP</a></li>
                                     </ul>

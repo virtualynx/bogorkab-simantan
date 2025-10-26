@@ -28,6 +28,7 @@ Route::prefix('wilayah')->group(function () {
 });
 
 Route::prefix('history')->group(function () {
+    Route::get('/school/answered_list', [HistoryApi::class, 'getSchoolAnsweredList']);
     Route::get('/school/byname', [HistoryApi::class, 'getSchoolByName']);
     Route::get('/checkanswer/by_schoolname', [HistoryApi::class, 'checkAnswerBySchoolName']);
 });

@@ -1,5 +1,13 @@
 @extends('template.temp')
 
+@push('head_stacks')
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet Locate Control CSS -->
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" /> --}}
+@endpush
+
 @section('content')    
     <style>
         .close-btn {
@@ -45,13 +53,34 @@
 
                     <h6 class="text-center">Sistem Informasi Pendidikan Kecamatan</h6>
 
-                    <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search" onsubmit="searchMarkers(event)">
+                    {{-- <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search" onsubmit="searchMarkers(event)">
                         <div class="input-group input-group-lg">
                             <span class="input-group-text bi-search" id="basic-addon1">
                                 
                             </span>
 
                             <input name="keyword" type="search" class="form-control" id="keyword" placeholder="Nama sekolah ..." aria-label="Search" autocomplete="off">
+                            <button type="submit" class="form-control">Search</button>
+                        </div>
+                    </form> --}}
+
+                    <style>
+                        #clearSearchBtn {
+                            border: 1px solid #ced4da;
+                            background: white;
+                            font-size: 18px;
+                            padding: 0 12px;
+                            cursor: pointer;
+                        }
+                    </style>
+                    <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search" onsubmit="searchMarkers(event)">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bi-search" id="basic-addon1"></span>
+                            
+                            <input name="keyword" type="search" class="form-control" id="keyword" placeholder="Nama sekolah ..." aria-label="Search" autocomplete="off">
+                            
+                            <button type="button" class="btn btn-outline-secondary" id="clearSearchBtn" style="display: none;">×</button>
+                            
                             <button type="submit" class="form-control">Search</button>
                         </div>
                     </form>
@@ -82,114 +111,166 @@
             </div>
         </div>
     </section>
+@endsection
+
+{{-- OSM map --}}
+@push('scripts')
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet Locate Control JS -->
+    {{-- <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.js"></script> --}}
 
     <script>
-        function loadGoogleMaps() {
-            return new Promise(function(resolve, reject) {
-                if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-                    // Load the Google Maps JavaScript API
-                    var script = document.createElement('script');
-                    script.src = 'https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap';
-                    script.async = true;
-                    script.defer = true;
-                    script.onerror = reject;
-                    script.onload = resolve;
-                    document.head.appendChild(script);
-                } else {
-                    resolve();
+        // Add this script after your existing document ready function
+        let map, markers = {};
+
+        $(document).ready(function() {
+            initMap();
+
+            $.ajax({
+                url: '{{ url("api/history/school/answered_list") }}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        response.data.forEach(row => {
+                            if(row.lat){
+                                addMarker(row.lat, row.lng, row);
+                            }
+                        });
+                        fitMapToMarkers(); // Add this line
+                    } else {
+                        alert('Gagal memuat data sekolah');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMessage = `Error ${xhr.status}: `;
+                    errorMessage += xhr.statusText || 'Unknown error';
+                    
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        errorMessage = response.message || response.error || errorMessage;
+                    } catch (e) {
+                        // Not JSON response
+                    }
+
+                    console.error('AJAX Error', xhr.status, error);
+                    console.log('errorMessage', errorMessage);
+                    alert('Gagal memuat data sekolah');
+                },
+                complete: function() {
                 }
             });
-        }
 
-        var map;
-        var markers = []; // Declare markers array to store marker objects
+            $('#clearSearchBtn').on('click', function() {
+                showAllMarkers();
+            });
+            
+            $('#keyword').on('input', function() {
+                toggleClearButton();
+            });
+            
+            // Initialize clear button state
+            toggleClearButton();
+        });
 
         function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -6.6020, lng: 106.7651},
-                zoom: 14
-            });
-
-            var markerCoords = [
-                {lat: -6.5971, lng: 106.8060},
-                {lat: -6.5946, lng: 106.7904},
-                {lat: -6.6030, lng: 106.7950},
-                // Add more coordinates as needed
-            ];
-
-            // Function to add markers and bind popups
-            function addMarkers() {
-                for (var i = 0; i < markerCoords.length; i++) {
-                    var marker = new google.maps.Marker({
-                        position: markerCoords[i],
-                        map: map,
-                    });
-                    marker.markID = i;
-                    marker.markName = "sekolah " + (i + 1);
-
-                    // Add click event listener to each marker
-                    marker.addListener('click', function () {
-                        openMarker(this);
-                    });
-
-                    markers.push(marker);
-                }
-            }
-
-            // Function to open the sidebar and display marker information
-            function openMarker(marker) {
-                var infoWindowContent = getInfoWindowContent(marker);
-                document.getElementById('sidebarContent').innerHTML = infoWindowContent;
-                sidebarContainer.classList.add("open");
-                document.getElementById('map').classList.add("map-with-sidebar"); 
-            }
-
-            // Function to close the sidebar
-            function closeSidebar() {
-                sidebarContainer.classList.remove("open");
-                document.getElementById('map').classList.remove("map-with-sidebar");
-            }
-
-            // Attach click event listener to the close button
-            var closeSidebarBtn = document.getElementById("closeSidebarBtn");
-            closeSidebarBtn.addEventListener("click", function() {
-                closeSidebar();
-            });
-
-            // Call the addMarkers function to add markers to the map initially
-            addMarkers();
+            // Default location (you can set to user's current location or a default)
+            const defaultLat = -6.6027;
+            const defaultLng = 106.7653;
+            
+            // Initialize map
+            map = L.map('map').setView([defaultLat, defaultLng], 15);
+            // map = L.map('map');
+            
+            // Add OSM tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
         }
 
-        // Function to filter markers based on search keyword
+        function addMarker(lat, lng, schoolData){
+            const markerId = `marker_${lat}_${lng}_${Date.now()}`;
+            const marker = L.marker([lat, lng], { 
+                draggable: false,
+                opacity: 1
+            }).addTo(map);
+            
+            // Store school data with marker
+            marker.schoolData = schoolData;
+            markers[markerId] = marker;
+            
+            // Add click event to show school info
+            marker.on('click', function() {
+                showSchoolInfo(schoolData);
+            });
+            
+            return marker;
+        }
+
+        function fitMapToMarkers() {
+            if (Object.keys(markers).length > 0) {
+                const group = new L.featureGroup(Object.values(markers));
+                map.fitBounds(group.getBounds(), { padding: [20, 20] });
+            }
+        }
+
+        function showSchoolInfo(schoolData) {
+            const sidebarContent = document.getElementById('sidebarContent');
+            sidebarContent.innerHTML = `
+                <h3>${schoolData.name || 'N/A'}</h3>
+                <p>Alamat: ${schoolData.address || 'N/A'}</p>
+                <!-- Add more school info as needed -->
+            `;
+            document.getElementById('sidebarContainer').classList.add('open');
+        }
+
         function searchMarkers(event) {
             event.preventDefault();
-
-            var keyword = document.getElementById("keyword").value.toLowerCase();
-
-                markers.forEach(function (marker) {
-                    var popupContent = marker.get('content').toLowerCase();
-                    if (popupContent.indexOf(keyword) > -1) {
-                        marker.setVisible(true);
-                    } else {
-                        marker.setVisible(false);
-                    }
-                });
+            const keyword = $('#keyword').val().toLowerCase().trim();
+            
+            // Hide all markers first
+            Object.values(markers).forEach(marker => {
+                marker.setOpacity(0.3);
+            });
+            
+            // Show only matching markers
+            Object.entries(markers).forEach(([id, marker]) => {
+                const schoolName = marker.schoolData?.name?.toLowerCase() || '';
+                if (schoolName.includes(keyword)) {
+                    marker.setOpacity(1);
+                }
+            });
+            
+            // Fit map to visible markers
+            const visibleMarkers = Object.values(markers).filter(marker => 
+                marker.options.opacity === 1
+            );
+            
+            if (visibleMarkers.length > 0) {
+                const group = new L.featureGroup(visibleMarkers);
+                map.fitBounds(group.getBounds(), { padding: [20, 20] });
             }
 
-        function getInfoWindowContent(marker) {
-            var content = `
-                <div class="text-center">
-                    <h6 class="fs-10 mb-2">Sekolah ${marker.markID + 1}</h6>
-                    <!-- Add more information as needed -->
-                </div>
-            `;
-            return content;
+            document.getElementById('sidebarContainer').classList.remove('open');
         }
 
-        loadGoogleMaps().then(function() {
-            initMap();
-        }).catch(function(error) {
-            console.error('Failed to load Google Maps API:', error);
-        });
+        // Function to show all markers
+        function showAllMarkers() {
+            Object.values(markers).forEach(marker => {
+                marker.setOpacity(1);
+            });
+            fitMapToMarkers();
+            $('#keyword').val('');
+            $('#clearSearchBtn').hide();
+            document.getElementById('sidebarContainer').classList.remove('open');
+        }
+
+        // Function to handle clear search button visibility
+        function toggleClearButton() {
+            const hasValue = $('#keyword').val().trim() !== '';
+            $('#clearSearchBtn').toggle(hasValue);
+        }
     </script>
-@endsection
+@endpush
