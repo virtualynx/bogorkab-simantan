@@ -5,12 +5,12 @@
             <div id="map" style="height: 100%;"></div>
         </div>
         
-        <input type="hidden" name="lat">
-        <input type="hidden" name="lng">
+        <input type="hidden" name="lat" value="{{ old('lat') }}">
+        <input type="hidden" name="lng" value="{{ old('lng') }}">
     </div>
 </div>
 
-@push('head-stacks')
+@push('head_stacks')
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -101,6 +101,13 @@
             //         title: "Tunjukkan lokasi saya"
             //     }
             // }).addTo(map);
+
+            @if(!empty(old('lat')))
+                const lat = {{ old('lat') }};
+                const lng = {{ old('lng') }};
+                initMarker(lat, lng);
+                map.setView([lat, lng], 15);
+            @endif
         }
 
         function initMarker(lat, lng){

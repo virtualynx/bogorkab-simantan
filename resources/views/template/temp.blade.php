@@ -77,7 +77,7 @@
             <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header bg-danger text-white">
                     <i class="bi bi-check-circle-fill me-2"></i>
-                    <strong class="me-auto">Sukses</strong>
+                    <strong class="me-auto">Error</strong>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -127,9 +127,9 @@
                                         {{-- <li><a class="dropdown-item" href="{{ route('sarpas.tk') }}">Sarpas TK</a></li>
                                         <li><a class="dropdown-item" href="{{ route('sarpas.kb') }}">Sarpas KB</a></li>
                                         <li><a class="dropdown-item" href="{{ route('sarpas.sps') }}">Sarpas SPS</a></li> --}}
-                                        <li><a class="dropdown-item" href="{{ url('/sarpas/view?spm=SPM_TK') }}">Sarpas TK</a></li>
-                                        <li><a class="dropdown-item" href="{{ url('/sarpas/view?spm=SPM_KB') }}">Sarpas KB</a></li>
-                                        <li><a class="dropdown-item" href="{{ url('/sarpas/view?spm=SPM_SPS') }}">Sarpas SPS</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/paud_view?spm=SPM_TK') }}">Sarpas TK</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/paud_view?spm=SPM_KB') }}">Sarpas KB</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/paud_view?spm=SPM_SPS') }}">Sarpas SPS</a></li>
                                     </ul>
                                 </li>
 
@@ -138,8 +138,9 @@
                                         Sarpas Dasar
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ route('sarpas.sd') }}">Sarpas SD</a></li>
-                                        <li><a class="dropdown-item" >Sarpas SMP</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/sd') }}">Sarpas SD Test</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/dasar_view?spm=SPM_SD') }}">Sarpas SD</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/dasar_view?spm=SPM_SMP') }}">Sarpas SMP</a></li>
                                     </ul>
                                 </li>
         

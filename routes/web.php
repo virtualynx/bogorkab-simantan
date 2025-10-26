@@ -17,15 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [SPMController::class, 'index'])->name('/');
 
 Route::prefix('sarpas')->group(function () {
-    Route::get('/view', [SPMController::class, 'sarpasPAUD']);
-    Route::post('/save', [SPMController::class, 'savePAUD']);
+    Route::get('/paud_view', [SPMController::class, 'sarpasPAUD']);
+    Route::post('/paud_save', [SPMController::class, 'savePAUD']);
 
-    Route::get('/tk', [SPMController::class, 'sarpasTK'])->name('sarpas.tk');
-    Route::post('/tk', [SPMController::class, 'storeTK'])->name('sarpas.tk');
+    Route::get('/sd', [SPMController::class, 'sarpasSDTest']);
 
-    Route::get('/kb', [SPMController::class, 'sarpasKB'])->name('sarpas.kb');
-    Route::get('/sps', [SPMController::class, 'sarpasSPS'])->name('sarpas.sps');
-
-    Route::get('/sd', [SPMController::class, 'sarpasSD'])->name('sarpas.sd');
-    Route::post('/sd', [SPMController::class, 'storeSD'])->name('sarpas.sd');
+    Route::get('/dasar_view', [SPMController::class, 'sarpasDasar']);
+    Route::post('/dasar_save', [SPMController::class, 'saveDasar']);
 });

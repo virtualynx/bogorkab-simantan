@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <hr>
-                <form id="form-tk" class="needs-validation" novalidate action="{{ url('/sarpas/paud_save?spm='.$spm_level_id) }}" method="post" autocomplete="off">
+                <form id="form-tk" class="needs-validation" novalidate action="{{ url('/sarpas/dasar_save?spm='.$spm_level_id) }}" method="post" autocomplete="off">
                     @csrf
 
                     <input name="spm_level_id" type="hidden" value="{{ $spm_level_id }}">
@@ -104,19 +104,19 @@
 
                             <div class="row gx-2 mb-3">
                                 <div class="col">
-                                    <label class="col-form-label text-capitalize" for="rombel_a">Rombel-A<span class="icn-req">*</span></label>
+                                    <label class="col-form-label text-capitalize" for="rombel">Jumlah Rombel<span class="icn-req">*</span></label>
                                     <div class="col">
-                                        <input id="rombel_a" name="rombel_a" type="text" class="form-control @error('rombel_a') is-invalid @enderror" required="" placeholder="" value="{{ old('rombel_a') }}">
-                                        @error('rombel_a')
+                                        <input id="rombel" name="rombel" type="text" class="form-control @error('rombel') is-invalid @enderror" required="" placeholder="" value="{{ old('rombel') }}">
+                                        @error('rombel')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <label class="col-form-label text-capitalize" for="rombel_b">Rombel-B<span class="icn-req">*</span></label>
+                                    <label class="col-form-label text-capitalize" for="class_count">Jumlah Ruang Belajar<span class="icn-req">*</span></label>
                                     <div class="col">
-                                        <input id="rombel_b" name="rombel_b" type="text" class="form-control @error('rombel_b') is-invalid @enderror" required="" placeholder="" value="{{ old('rombel_b') }}">
-                                        @error('rombel_b')
+                                        <input id="class_count" name="class_count" type="text" class="form-control @error('class_count') is-invalid @enderror" required="" placeholder="" value="{{ old('class_count') }}">
+                                        @error('class_count')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -385,13 +385,13 @@
 				document.getElementById('kualifikasi_count_SMA').value = school.teacher_sma_count || '0';
 				document.getElementById('kualifikasi_count_SMP').value = school.teacher_smp_count || '0';
 				document.getElementById('kualifikasi_count_SD').value = school.teacher_sd_count || '0';
-				document.getElementById('rombel_a').value = school.rombel_a_count || '0';
-				document.getElementById('rombel_b').value = school.rombel_b_count || '0';
+				document.getElementById('rombel').value = school.rombel_count || '0';
+				document.getElementById('class_count').value = school.class_count || '0';
 				document.getElementById('student_count').value = school.student_count || '0';
                 document.getElementById('accreditation').value = school.accreditation || '';
                 document.getElementById('address_village').value = school.address_village_code || '';
                 document.getElementById('address_detail').value = school.address || '';
-                
+
                 if(school.lat){
                     if(!marker){
                         initMarker(school.lat, school.lng);
