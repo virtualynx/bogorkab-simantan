@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class WilayahService
+{
+    /**
+     * Base URL for Wilayah.id API
+     */
+    protected string $baseUrl = 'https://wilayah.id/api';
+
+    public function getDefaultProvince(){
+        $result = Cache::remember('wilayahservices_default_province', 2, function () {
+            $provinces = $this->getProvinces();
+            $defaultProvince = collect($provinces)->firstWhere('name', 'Jawa Barat');
+
+            return $defaultProvince;
+        });
+
+        return $result;
+    }
+
+    public function listDefaultRegency(){
+        $defaultProvince = $this->getDefaultProvince();
+        $defaultProvinceCode = $defaultProvince['code'];
+
+        $results = Cache::remember("listDefaultRegency_$defaultProvinceCode", 2, function () use($defaultProvinceCode) {
+            $regencies = $this->getRegencies($defaultProvinceCode);
+
+            return $regencies;
+        });
+
+        return $results;
+    }
+
+    public function getDefaultRegency(){
+        $defaultRegencies = $this->listDefaultRegency();
+        $defaultRegency = collect($defaultRegencies)->firstWhere('name', 'Kabupaten Bogor');
+
+        return $defaultRegency;
+    }
+
+    public function listDefaultDistrict(){
+        $defaultRegency = $this->getDefaultRegency();
+        $defaultRegencyCode = $defaultRegency['code'];
+
+        $results = Cache::remember("listDefaultDistricts_$defaultRegencyCode", 2, function () use($defaultRegencyCode) {
+            $districts = $this->getDistricts($defaultRegencyCode);
+
+            return $districts;
+        });
+
+        return $results;
+    }
+
+    public function getDefaultDistrict(){
+        $defaultDistricts = $this->listDefaultDistrict();
+        $defaultDistrict = collect($defaultDistricts)->firstWhere('name', 'Ciomas');
+
+        return $defaultDistrict;
+    }
+
+    public function listDefaultVillage(){
+        $defaultDistrict = $this->getDefaultDistrict();
+        $defaultDistrictCode = $defaultDistrict['code'];
+
+        $results = Cache::remember("listDefaultVillage_$defaultDistrictCode", 2, function () use($defaultDistrictCode) {
+            $villages = $this->getVillages($defaultDistrictCode);
+
+            return $villages;
+        });
+
+        return $results;
+    }
+
+    /**
+     * Get all provinces in Indonesia
+     */
+    public function getProvinces(): array
+    {
+        $results = Cache::remember('apicall_provinces', 5, function () {
+            return $this->makeRequest('/provinces.json');
+        });
+
+        return $results;
+    }
+
+    /**
+     * Get regencies/cities by province code
+     */
+    public function getRegencies(string $provinceCode): array
+    {
+        $results = Cache::remember("apicall_regencies_$provinceCode", 5, function () use($provinceCode) {
+            return $this->makeRequest("/regencies/{$provinceCode}.json");
+        });
+
+        return $results;
+    }
+
+    /**
+     * Get districts by regency code
+     */
+    public function getDistricts(string $regencyCode): array
+    {
+        $results = Cache::remember("apicall_districts_$regencyCode", 5, function () use($regencyCode) {
+            return $this->makeRequest("/districts/{$regencyCode}.json");
+        });
+
+        return $results;
+    }
+
+    /**
+     * Get villages by district code
+     */
+    public function getVillages(string $districtCode): array
+    {
+        $results = Cache::remember("apicall_villages_$districtCode", 5, function () use($districtCode) {
+            return $this->makeRequest("/villages/{$districtCode}.json");
+        });
+
+        return $results;
+    }
+
+    /**
+     * Make HTTP request to Wilayah.id API
+     */
+    protected function makeRequest(string $endpoint): array
+    {
+        try {
+            $response = Http::timeout(30)
+                ->retry(3, 100)
+                ->get($this->baseUrl . $endpoint);
+
+            if ($response->successful()) {
+                return $response->json('data', []);
+            }
+
+            Log::error('Wilayah API request failed', [
+                'endpoint' => $endpoint,
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+
+            return [];
+
+        } catch (\Exception $e) {
+            Log::error('Wilayah API exception', [
+                'endpoint' => $endpoint,
+                'message' => $e->getMessage()
+            ]);
+
+            return [];
+        }
+    }
+}

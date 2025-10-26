@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\PublicController;
+use App\Http\Controllers\SPMController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,13 +14,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [PublicController::class, 'index'])->name('/');
-// TK
-Route::get('/sarpas/tk', [PublicController::class, 'sarpasTK'])->name('sarpas.tk');
-Route::post('/sarpas/tk', [PublicController::class, 'storeTK'])->name('sarpas.tk');
+Route::get('/', [SPMController::class, 'index'])->name('/');
 
-Route::get('/sarpas/kb', [PublicController::class, 'sarpasKB'])->name('sarpas.kb');
-Route::get('/sarpas/sps', [PublicController::class, 'sarpasSPS'])->name('sarpas.sps');
+Route::prefix('sarpas')->group(function () {
+    Route::get('/tk', [SPMController::class, 'sarpasTK'])->name('sarpas.tk');
+    Route::post('/tk', [SPMController::class, 'storeTK'])->name('sarpas.tk');
 
-Route::get('/sarpas/sd', [PublicController::class, 'sarpasSD'])->name('sarpas.sd');
-Route::post('/sarpas/sd', [PublicController::class, 'storeSD'])->name('sarpas.sd');
+    Route::get('/kb', [SPMController::class, 'sarpasKB'])->name('sarpas.kb');
+    Route::get('/sps', [SPMController::class, 'sarpasSPS'])->name('sarpas.sps');
+
+    Route::get('/sd', [SPMController::class, 'sarpasSD'])->name('sarpas.sd');
+    Route::post('/sd', [SPMController::class, 'storeSD'])->name('sarpas.sd');
+});

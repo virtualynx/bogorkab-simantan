@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>SIMANTAN |  {{ $meta['title'] }}</title>
+        <title>SIMANTAN |  {{ $title }}</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,6 +57,8 @@
             }
 
         </style>
+
+        @stack('head_stacks') <!-- For CSS / JS stacks -->
     </head>
     
     <body id="top">
@@ -196,5 +198,6 @@
         <script src="{{ asset('/theme') }}/js/jquery.sticky.js"></script>
         <script src="{{ asset('/theme') }}/js/custom.js"></script>
 
+        @stack('scripts') <!-- For JS stacks -->
     </body>
 </html>

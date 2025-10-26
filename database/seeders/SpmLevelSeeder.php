@@ -35,6 +35,20 @@ class SpmLevelSeeder extends Seeder
                 'created_by' => 'system',
                 'is_disabled' => false,
             ],
+            [
+                'spm_level_id' => 'SPM_SD',
+                'name' => 'Persyaratan SPM SD',
+                'created_at' => now(),
+                'created_by' => 'system',
+                'is_disabled' => false,
+            ],
+            [
+                'spm_level_id' => 'SPM_SMP',
+                'name' => 'Persyaratan SPM SMP',
+                'created_at' => now(),
+                'created_by' => 'system',
+                'is_disabled' => false,
+            ],
         ];
         
         DB::table('spm_level')->insert($data);
