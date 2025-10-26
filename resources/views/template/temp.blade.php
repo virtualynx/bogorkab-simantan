@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>SIMANTAN |  {{ $meta['title'] }}</title>
+        <title>SIMANTAN |  {{ $title }}</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
         <!-- Include the Font Awesome CSS for the school icon -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        {!! RecaptchaV3::initJs() !!}
+        {{-- {!! RecaptchaV3::initJs() !!} --}}
 
         <style>
             /* Example of custom styles for the Places Autocomplete input box */
@@ -57,12 +57,50 @@
             }
 
         </style>
+
+        @stack('head_stacks') <!-- For CSS / JS stacks -->
     </head>
     
     <body id="top">
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success text-white">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong class="me-auto">Sukses</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ session('success') }}
+                </div>
+            </div>
+            <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-danger text-white">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong class="me-auto">Error</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ session('error') }}
+                </div>
+            </div>
+        </div>
+        <script>
+            @if(session('success'))
+                document.addEventListener('DOMContentLoaded', function() {
+                    var successToast = new bootstrap.Toast(document.getElementById('successToast'));
+                    successToast.show();
+                });
+            @endif
+            @if(session('error'))
+                document.addEventListener('DOMContentLoaded', function() {
+                    var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                    errorToast.show();
+                });
+            @endif
+        </script>
 
         <main>
-
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
                     <div class="d-flex justify-content-between w-100">
@@ -86,9 +124,12 @@
                                         Sarpas PAUD
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ route('sarpas.tk') }}">Sarpas TK</a></li>
+                                        {{-- <li><a class="dropdown-item" href="{{ route('sarpas.tk') }}">Sarpas TK</a></li>
                                         <li><a class="dropdown-item" href="{{ route('sarpas.kb') }}">Sarpas KB</a></li>
-                                        <li><a class="dropdown-item" href="{{ route('sarpas.sps') }}">Sarpas SPS</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('sarpas.sps') }}">Sarpas SPS</a></li> --}}
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/paud_view?spm=SPM_TK') }}">Sarpas TK</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/paud_view?spm=SPM_KB') }}">Sarpas KB</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/paud_view?spm=SPM_SPS') }}">Sarpas SPS</a></li>
                                     </ul>
                                 </li>
 
@@ -97,8 +138,9 @@
                                         Sarpas Dasar
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ route('sarpas.sd') }}">Sarpas SD</a></li>
-                                        <li><a class="dropdown-item" >Sarpas SMP</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/sd') }}">Sarpas SD Test</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/dasar_view?spm=SPM_SD') }}">Sarpas SD</a></li>
+                                        <li><a class="dropdown-item" href="{{ url('/sarpas/dasar_view?spm=SPM_SMP') }}">Sarpas SMP</a></li>
                                     </ul>
                                 </li>
         
@@ -196,5 +238,6 @@
         <script src="{{ asset('/theme') }}/js/jquery.sticky.js"></script>
         <script src="{{ asset('/theme') }}/js/custom.js"></script>
 
+        @stack('scripts') <!-- For JS stacks -->
     </body>
 </html>
