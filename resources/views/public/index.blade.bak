@@ -4,66 +4,8 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- Awesomplete CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css" />
-
-    <style>
-        .awesomplete {
-            width: 100%;
-            position: relative;
-        }
-
-        .awesomplete > input {
-            width: 100%;
-            padding: 12px 45px 12px 15px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            transition: border-color 0.3s ease;
-        }
-
-        .awesomplete > input:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-
-        .awesomplete > ul {
-            position: absolute;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: white;
-            border: 1px solid #007bff;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: -1px;
-        }
-
-        .awesomplete > ul > li {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 15px;
-        }
-
-        .awesomplete > ul > li:hover {
-            background-color: #f8f9fa;
-        }
-
-        .awesomplete > ul > li[aria-selected="true"] {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .awesomplete mark {
-            background-color: #fff3cd;
-            padding: 0;
-        }
-    </style>
+    <!-- Leaflet Locate Control CSS -->
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" /> --}}
 @endpush
 
 @section('content')    
@@ -76,7 +18,7 @@
             font-size: 32px;
             color: #fdfdfd;
             cursor: pointer;
-            z-index: 1001;
+            z-index: 1001; /* Increase z-index to make sure it appears above the sidebar */
         }
 
         .sidebar-container {
@@ -99,47 +41,9 @@
         }
 
         #map.map-with-sidebar {
-            margin-left: 320px;
+            margin-left: 320px; /* Set the left margin to give space for the sidebar */
         }
 
-        .search-container {
-            position: relative;
-        }
-
-        .clear-search {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #999;
-            display: none;
-            z-index: 1002;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s ease;
-        }
-
-        .clear-search:hover {
-            color: #333;
-            background-color: #f0f0f0;
-        }
-
-        .search-container {
-            position: relative;
-            margin-bottom: 10px;
-        }
-
-        .custom-form {
-            position: relative;
-        }
     </style>
     <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
         <div class="container">
@@ -149,19 +53,37 @@
 
                     <h6 class="text-center">Sistem Informasi Pendidikan Kecamatan</h6>
 
-                    <div class="custom-form mt-4 pt-2 mb-lg-0 mb-5">
-                        <div class="search-container">
-                            <input 
-                                type="search" 
-                                class="form-control form-control-lg" 
-                                id="schoolSearch" 
-                                placeholder="Cari nama sekolah ..." 
-                                aria-label="Search"
-                                autocomplete="off"
-                            >
-                            <button type="button" class="clear-search" id="clearSearch">×</button>
+                    {{-- <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search" onsubmit="searchMarkers(event)">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bi-search" id="basic-addon1">
+                                
+                            </span>
+
+                            <input name="keyword" type="search" class="form-control" id="keyword" placeholder="Nama sekolah ..." aria-label="Search" autocomplete="off">
+                            <button type="submit" class="form-control">Search</button>
                         </div>
-                    </div>
+                    </form> --}}
+
+                    <style>
+                        #clearSearchBtn {
+                            border: 1px solid #ced4da;
+                            background: white;
+                            font-size: 18px;
+                            padding: 0 12px;
+                            cursor: pointer;
+                        }
+                    </style>
+                    <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search" onsubmit="searchMarkers(event)">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bi-search" id="basic-addon1"></span>
+                            
+                            <input name="keyword" type="search" class="form-control" id="keyword" placeholder="Nama sekolah ..." aria-label="Search" autocomplete="off">
+                            
+                            <button type="button" class="btn btn-outline-secondary" id="clearSearchBtn" style="display: none;">×</button>
+                            
+                            <button type="submit" class="form-control">Search</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -198,12 +120,13 @@
                             </div>
                             <!-- Map container -->
                             <style>
+                                /* Add CSS to prevent map clicks from being blocked by sidebar */
                                 .sidebar-container {
-                                    pointer-events: auto;
+                                    pointer-events: auto; /* Allow clicks on sidebar content */
                                 }
 
                                 #map {
-                                    pointer-events: all;
+                                    pointer-events: all; /* Ensure map receives clicks */
                                 }
                             </style>
                             <div id="map" style="height: 500px;"></div>
@@ -216,20 +139,20 @@
     </section>
 @endsection
 
+{{-- OSM map --}}
 @push('scripts')
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Awesomplete JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
+    <!-- Leaflet Locate Control JS -->
+    {{-- <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.js"></script> --}}
 
     <!-- Gauge.js -->
     <script src="https://cdn.jsdelivr.net/npm/gaugeJS/dist/gauge.min.js"></script>
 
     <script>
+        // Add this script after your existing document ready function
         let map, markers = {};
-        let schoolDataList = [];
-        let awesomplete;
 
         $(document).ready(function() {
             initMap();
@@ -238,21 +161,18 @@
                 document.getElementById('sidebarContainer').classList.remove('open');
             });
 
-            // Load school data
             $.ajax({
                 url: '{{ url("api/history/school/answered_list") }}',
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        schoolDataList = response.data;
                         response.data.forEach(row => {
                             if(row.lat){
                                 addMarker(row.lat, row.lng, row);
                             }
                         });
-                        fitMapToMarkers();
-                        initAutocomplete();
+                        fitMapToMarkers(); // Add this line
                     } else {
                         alert('Gagal memuat data sekolah');
                     }
@@ -269,110 +189,38 @@
                     }
 
                     console.error('AJAX Error', xhr.status, error);
+                    console.log('errorMessage', errorMessage);
                     alert('Gagal memuat data sekolah');
+                },
+                complete: function() {
                 }
             });
 
-            // Clear search button
-            $('#clearSearch').on('click', function() {
-                $('#schoolSearch').val('');
-                $(this).hide();
+            $('#clearSearchBtn').on('click', function() {
                 showAllMarkers();
             });
-
-            // Show/hide clear button based on input
-            $('#schoolSearch').on('input', function() {
-                $('#clearSearch').toggle($(this).val().length > 0);
+            
+            $('#keyword').on('input', function() {
+                toggleClearButton();
             });
-
-            // Close sidebar when clicking close button
-            $('#closeSidebarBtn').on('click', function() {
-                document.getElementById('sidebarContainer').classList.remove('open');
-            });
+            
+            // Initialize clear button state
+            toggleClearButton();
         });
 
         function initMap() {
+            // Default location (you can set to user's current location or a default)
             const defaultLat = -6.6027;
             const defaultLng = 106.7653;
             
+            // Initialize map
             map = L.map('map').setView([defaultLat, defaultLng], 15);
+            // map = L.map('map');
             
+            // Add OSM tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-        }
-
-        function initAutocomplete() {
-            const schoolNames = schoolDataList.map(school => school.name || '').filter(name => name);
-            
-            awesomplete = new Awesomplete(document.getElementById('schoolSearch'), {
-                list: schoolNames,
-                minChars: 1,
-                maxItems: 10,
-                autoFirst: true
-            });
-
-            // Handle selection from autocomplete
-            $('#schoolSearch').on('awesomplete-selectcomplete', function() {
-                const selectedSchoolName = $(this).val();
-                const selectedSchool = schoolDataList.find(school => school.name === selectedSchoolName);
-                
-                if (selectedSchool) {
-                    // Hide all markers
-                    Object.values(markers).forEach(marker => {
-                        marker.setOpacity(0.0);
-                    });
-                    
-                    // Find and show the selected marker
-                    const marker = Object.values(markers).find(m => 
-                        m.schoolData && m.schoolData.name === selectedSchoolName
-                    );
-                    
-                    if (marker) {
-                        marker.setOpacity(1);
-                        map.setView(marker.getLatLng(), 16);
-                        showSchoolInfo(selectedSchool);
-                    }
-                }
-            });
-
-            // Handle enter key press
-            $('#schoolSearch').on('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const searchTerm = $(this).val().toLowerCase().trim();
-                    
-                    if (searchTerm === '') {
-                        showAllMarkers();
-                        return;
-                    }
-                    
-                    // Hide all markers first
-                    Object.values(markers).forEach(marker => {
-                        marker.setOpacity(0.0);
-                    });
-                    
-                    // Show matching markers
-                    const visibleMarkers = [];
-                    Object.entries(markers).forEach(([id, marker]) => {
-                        const schoolName = marker.schoolData?.name?.toLowerCase() || '';
-                        if (schoolName.includes(searchTerm)) {
-                            marker.setOpacity(1);
-                            visibleMarkers.push(marker);
-                        }
-                    });
-                    
-                    // Fit map to visible markers
-                    if (visibleMarkers.length > 0) {
-                        const group = new L.featureGroup(visibleMarkers);
-                        map.fitBounds(group.getBounds(), { padding: [20, 20] });
-                    } else {
-                        alert('Tidak ada sekolah yang sesuai dengan pencarian: ' + searchTerm);
-                    }
-                    
-                    document.getElementById('sidebarContainer').classList.remove('open');
-                }
-            });
         }
 
         function addMarker(lat, lng, schoolData){
@@ -382,9 +230,11 @@
                 opacity: 1
             }).addTo(map);
             
+            // Store school data with marker
             marker.schoolData = schoolData;
             markers[markerId] = marker;
             
+            // Add click event to show school info
             marker.on('click', function() {
                 showSchoolInfo(schoolData);
             });
@@ -399,10 +249,61 @@
             }
         }
 
+        // function showSchoolInfo(schoolData) {
+        //     const sidebarContent = document.getElementById('sidebarContent');
+        //     sidebarContent.innerHTML = `
+        //         <h3>${schoolData.name || 'N/A'}</h3>
+        //         <p>Alamat: ${schoolData.address || 'N/A'}</p>
+        //         <!-- Add more school info as needed -->
+        //     `;
+        //     document.getElementById('sidebarContainer').classList.add('open');
+        // }
+
+        // function showSchoolInfo(schoolData) {
+        //     const sidebarContent = document.getElementById('sidebarContent');
+            
+        //     // Fetch completion rate for this school
+        //     $.ajax({
+        //         url: '{{ url("api/completion-rate") }}',
+        //         type: 'GET',
+        //         data: { 
+        //             school_id: schoolData.school_id,
+        //             year: new Date().getFullYear()
+        //         },
+        //         success: function(response) {
+        //             const completionRate = response.success ? response.data.completion_rate + '%' : 'N/A';
+                    
+        //             sidebarContent.innerHTML = `
+        //                 <h3>${schoolData.name || 'N/A'}</h3>
+        //                 <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
+        //                 <p><strong>Kepala Sekolah:</strong> ${schoolData.headmaster_name || 'N/A'}</p>
+        //                 <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
+        //                 <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
+        //                 <p><strong>Tingkat Kelengkapan:</strong> ${completionRate}</p>
+        //                 <!-- Add more school info as needed -->
+        //             `;
+        //             document.getElementById('sidebarContainer').classList.add('open');
+        //         },
+        //         error: function() {
+        //             // Fallback if completion rate API fails
+        //             sidebarContent.innerHTML = `
+        //                 <h3>${schoolData.name || 'N/A'}</h3>
+        //                 <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
+        //                 <p><strong>Kepala Sekolah:</strong> ${schoolData.headmaster_name || 'N/A'}</p>
+        //                 <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
+        //                 <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
+        //                 <p><strong>Tingkat Kelengkapan:</strong> Data tidak tersedia</p>
+        //             `;
+        //             document.getElementById('sidebarContainer').classList.add('open');
+        //         }
+        //     });
+        // }
+
         function showSchoolInfo(schoolData) {
             const sidebarContent = document.getElementById('sidebarContent');
             const gaugeContainer = document.getElementById('completionGaugeContainer');
             
+            // Show basic school info immediately
             sidebarContent.innerHTML = `
                 <h3>${schoolData.name || 'N/A'}</h3>
                 <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
@@ -413,6 +314,7 @@
             
             document.getElementById('sidebarContainer').classList.add('open');
             
+            // Initialize gauge if not already done
             if (!completionGauge) {
                 try {
                     initCompletionGauge();
@@ -422,6 +324,7 @@
                 }
             }
             
+            // Fetch completion rate and update gauge
             $.ajax({
                 url: '{{ url("api/completion-rate") }}',
                 type: 'GET',
@@ -432,8 +335,11 @@
                 success: function(response) {
                     if (response.success && response.data.completion_rate !== null) {
                         const completionRate = response.data.completion_rate;
+                        
+                        // Show gauge container
                         gaugeContainer.style.display = 'block';
                         
+                        // Update gauge
                         if (completionGauge) {
                             completionGauge.set(completionRate);
                             document.getElementById('gaugeLabel').textContent = 
@@ -451,29 +357,68 @@
             });
         }
 
+        function searchMarkers(event) {
+            event.preventDefault();
+            const keyword = $('#keyword').val().toLowerCase().trim();
+            
+            // Hide all markers first
+            Object.values(markers).forEach(marker => {
+                marker.setOpacity(0.0);
+            });
+            
+            // Show only matching markers
+            Object.entries(markers).forEach(([id, marker]) => {
+                const schoolName = marker.schoolData?.name?.toLowerCase() || '';
+                if (schoolName.includes(keyword)) {
+                    marker.setOpacity(1);
+                }
+            });
+            
+            // Fit map to visible markers
+            const visibleMarkers = Object.values(markers).filter(marker => 
+                marker.options.opacity === 1
+            );
+            
+            if (visibleMarkers.length > 0) {
+                const group = new L.featureGroup(visibleMarkers);
+                map.fitBounds(group.getBounds(), { padding: [20, 20] });
+            }
+
+            document.getElementById('sidebarContainer').classList.remove('open');
+        }
+
+        // Function to show all markers
         function showAllMarkers() {
             Object.values(markers).forEach(marker => {
                 marker.setOpacity(1);
             });
             fitMapToMarkers();
+            $('#keyword').val('');
+            $('#clearSearchBtn').hide();
             document.getElementById('sidebarContainer').classList.remove('open');
+        }
+
+        // Function to handle clear search button visibility
+        function toggleClearButton() {
+            const hasValue = $('#keyword').val().trim() !== '';
+            $('#clearSearchBtn').toggle(hasValue);
         }
 
         let completionGauge = null;
 
         function initCompletionGauge() {
             const opts = {
-                angle: -0.25,
-                lineWidth: 0.2,
-                radiusScale: 0.8,
+                angle: -0.25, // The span of the gauge arc
+                lineWidth: 0.2, // The line thickness
+                radiusScale: 0.8, // Relative radius
                 pointer: {
-                    length: 0.6,
-                    strokeWidth: 0.035,
-                    color: '#000000'
+                    length: 0.6, // Relative to gauge radius
+                    strokeWidth: 0.035, // The thickness
+                    color: '#000000' // Fill color
                 },
-                limitMax: true,
-                limitMin: true,
-                colorStart: '#6F6EA0',
+                limitMax: true, // If false, max value increases automatically if value > maxValue
+                limitMin: true, // If true, the min value of the gauge will be fixed
+                colorStart: '#6F6EA0', // Colors
                 colorStop: '#C0C0DB',
                 strokeColor: '#E0E0E0',
                 generateGradient: true,
@@ -491,7 +436,7 @@
             completionGauge.maxValue = 100;
             completionGauge.setMinValue(0);
             completionGauge.animationSpeed = 32;
-            completionGauge.set(0);
+            completionGauge.set(0); // Initialize with 0
         }
     </script>
 @endpush
