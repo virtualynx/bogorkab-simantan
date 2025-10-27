@@ -17,11 +17,11 @@
     <!-- Leaflet Locate Control CSS -->
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.css" /> --}}
 
-    <style>
+    {{-- <style>
         .leaflet-default-icon-path {
             background-image: url(https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png);
         }
-    </style>
+    </style> --}}
 @endpush
 
 {{-- OSM map --}}

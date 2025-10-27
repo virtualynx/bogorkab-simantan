@@ -28,6 +28,39 @@ Route::prefix('wilayah')->group(function () {
 });
 
 Route::prefix('history')->group(function () {
+    Route::get('/school/answered_list', [HistoryApi::class, 'getSchoolAnsweredList']);
     Route::get('/school/byname', [HistoryApi::class, 'getSchoolByName']);
     Route::get('/checkanswer/by_schoolname', [HistoryApi::class, 'checkAnswerBySchoolName']);
+});
+
+// Route::get('/completion-rate', function (Request $request) {
+//     $schoolId = $request->get('school_id');
+//     $year = $request->get('year', date('Y'));
+    
+//     $completionRate = DB::table('completion_rates')
+//         ->where('school_id', $schoolId)
+//         ->where('period_year', $year)
+//         ->first();
+    
+//     return response()->json([
+//         'success' => true,
+//         'data' => $completionRate ?: ['completion_rate' => null]
+//     ]);
+// });
+
+Route::get('/completion-rate', function (Request $request) {
+    $schoolId = $request->get('school_id');
+    $year = $request->get('year', date('Y'));
+    
+    $completionRate = DB::table('completion_rates')
+        ->where('school_id', $schoolId)
+        ->where('period_year', $year)
+        ->first();
+    
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'completion_rate' => $completionRate ? $completionRate->completion_rate : null
+        ]
+    ]);
 });

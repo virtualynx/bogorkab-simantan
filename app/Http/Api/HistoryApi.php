@@ -18,6 +18,29 @@ class HistoryApi extends Controller
     {
     }
 
+    public function getSchoolAnsweredList(): JsonResponse
+    {
+        $year = request('year');
+
+        if(empty($year)){
+            $year = now()->year;
+        }
+
+        $school_ids = Answer::query()
+            ->where('period_year', $year)
+            ->distinct()
+            ->pluck('school_id');
+
+        $res = School::query()
+            // ->whereIn('school_id', $school_ids)
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $res
+        ]);
+    }
+
     public function getSchoolByName(): JsonResponse
     {
         $search = request('q');

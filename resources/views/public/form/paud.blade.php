@@ -423,6 +423,11 @@
                     hideResults();
                 }
             });
+
+            // prevent reverse geocoding fill adress after adress is manually inputted
+            $(document).on('keyup', 'textarea[name="address"]', function() {
+                $(this).data('manual-input', true);
+            });
         });
     </script>
 @endpush
