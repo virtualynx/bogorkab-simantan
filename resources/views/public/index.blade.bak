@@ -304,12 +304,25 @@
             const gaugeContainer = document.getElementById('completionGaugeContainer');
             
             // Show basic school info immediately
+            // sidebarContent.innerHTML = `
+            //     <h3>${schoolData.name || 'N/A'}</h3>
+            //     <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
+            //     <p><strong>Kepala Sekolah:</strong> ${schoolData.headmaster_name || 'N/A'}</p>
+            //     <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
+            //     <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
+            // `;
+            
             sidebarContent.innerHTML = `
                 <h3>${schoolData.name || 'N/A'}</h3>
                 <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
                 <p><strong>Kepala Sekolah:</strong> ${schoolData.headmaster_name || 'N/A'}</p>
                 <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
                 <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
+                <div class="mt-3">
+                    <a href="/school/${schoolData.school_id}/answers" class="btn btn-primary btn-sm" target="_blank">
+                        Lihat Detail Jawaban
+                    </a>
+                </div>
             `;
             
             document.getElementById('sidebarContainer').classList.add('open');

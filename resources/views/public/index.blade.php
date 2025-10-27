@@ -403,12 +403,26 @@
             const sidebarContent = document.getElementById('sidebarContent');
             const gaugeContainer = document.getElementById('completionGaugeContainer');
             
+            // Show basic school info immediately
+            // sidebarContent.innerHTML = `
+            //     <h3>${schoolData.name || 'N/A'}</h3>
+            //     <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
+            //     <p><strong>Kepala Sekolah:</strong> ${schoolData.headmaster_name || 'N/A'}</p>
+            //     <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
+            //     <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
+            // `;
+            
             sidebarContent.innerHTML = `
                 <h3>${schoolData.name || 'N/A'}</h3>
                 <p><strong>NPSN:</strong> ${schoolData.NPSN || 'N/A'}</p>
                 <p><strong>Kepala Sekolah:</strong> ${schoolData.headmaster_name || 'N/A'}</p>
                 <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
                 <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
+                <div class="mt-3">
+                    <a href="/school/answers?school_id=${schoolData.school_id}" class="btn btn-primary btn-sm" target="_blank">
+                        Lihat Laporan SPM
+                    </a>
+                </div>
             `;
             
             document.getElementById('sidebarContainer').classList.add('open');
