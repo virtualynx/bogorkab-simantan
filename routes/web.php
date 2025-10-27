@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SPMController;
+use App\Http\Controllers\StatisticController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,3 +26,6 @@ Route::prefix('sarpas')->group(function () {
     Route::get('/dasar_view', [SPMController::class, 'sarpasDasar']);
     Route::post('/dasar_save', [SPMController::class, 'saveDasar']);
 });
+
+Route::get('/statistics_', [StatisticController::class, 'statistics_']);
+Route::get('/statistics', [StatisticController::class, 'statistics']);

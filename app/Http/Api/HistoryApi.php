@@ -32,7 +32,7 @@ class HistoryApi extends Controller
             ->pluck('school_id');
 
         $res = School::query()
-            ->whereIn('school_id', $school_ids)
+            // ->whereIn('school_id', $school_ids)
             ->get();
         
         return response()->json([

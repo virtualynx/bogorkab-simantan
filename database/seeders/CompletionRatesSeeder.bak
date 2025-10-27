@@ -1,0 +1,90 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class CompletionRatesSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Completion rates data
+        $completionRates = [];
+        $currentYear = date('Y');
+
+        // Get all schools grouped by type
+        $tkSchools = DB::table('school')->where('spm_level_id', 'SPM_TK')->pluck('school_id');
+        $kbSchools = DB::table('school')->where('spm_level_id', 'SPM_KB')->pluck('school_id');
+        $spsSchools = DB::table('school')->where('spm_level_id', 'SPM_SPS')->pluck('school_id');
+        $sdSchools = DB::table('school')->where('spm_level_id', 'SPM_SD')->pluck('school_id');
+        $smpSchools = DB::table('school')->where('spm_level_id', 'SPM_SMP')->pluck('school_id');
+
+        // Base completion rates
+        $rates = [
+            'SPM_TK' => 76,
+            'SPM_KB' => 71,
+            'SPM_SPS' => 74,
+            'SPM_SD' => 81,
+            'SPM_SMP' => 78,
+        ];
+
+        // Generate completion rates with some variation
+        foreach ($tkSchools as $schoolId) {
+            $completionRates[] = [
+                'school_id' => $schoolId,
+                'period_year' => $currentYear,
+                'completion_rate' => $rates['SPM_TK'] + mt_rand(-5, 5),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        foreach ($kbSchools as $schoolId) {
+            $completionRates[] = [
+                'school_id' => $schoolId,
+                'period_year' => $currentYear,
+                'completion_rate' => $rates['SPM_KB'] + mt_rand(-5, 5),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        foreach ($spsSchools as $schoolId) {
+            $completionRates[] = [
+                'school_id' => $schoolId,
+                'period_year' => $currentYear,
+                'completion_rate' => $rates['SPM_SPS'] + mt_rand(-5, 5),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        foreach ($sdSchools as $schoolId) {
+            $completionRates[] = [
+                'school_id' => $schoolId,
+                'period_year' => $currentYear,
+                'completion_rate' => $rates['SPM_SD'] + mt_rand(-5, 5),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        foreach ($smpSchools as $schoolId) {
+            $completionRates[] = [
+                'school_id' => $schoolId,
+                'period_year' => $currentYear,
+                'completion_rate' => $rates['SPM_SMP'] + mt_rand(-5, 5),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Insert completion rates
+        DB::table('completion_rates')->insert($completionRates);
+    }
+}
