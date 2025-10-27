@@ -292,6 +292,8 @@
 @endpush
 @push('scripts')
     <script>
+        const base_url = `{{ url() }}`;
+
         document.addEventListener('DOMContentLoaded', function() {
             const schoolNameInput = document.getElementById('school_name');
             const loadingSpinner = document.getElementById('school_search_loading');
@@ -324,7 +326,7 @@
 
             function fetchSchools(query) {
                 const spm_level_id = document.querySelector('input[name="spm_level_id"]').value;
-                fetch(`/api/history/school/byname?q=${encodeURIComponent(query)}&spm=${spm_level_id}`)
+                fetch(`${base_url}/api/history/school/byname?q=${encodeURIComponent(query)}&spm=${spm_level_id}`)
                     .then(response => response.json())
                     .then(data => {
                         loadingSpinner.classList.add('d-none');
@@ -407,7 +409,7 @@
             }
 
             function checkIfAnswered(schoolId) {
-                fetch(`/api/history/checkanswer/by_schoolname?school_id=${schoolId}`)
+                fetch(`${base_url}/api/history/checkanswer/by_schoolname?school_id=${schoolId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.data === 'already_answered') {
