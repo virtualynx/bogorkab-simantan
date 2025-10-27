@@ -363,7 +363,7 @@
             
             // Hide all markers first
             Object.values(markers).forEach(marker => {
-                marker.setOpacity(0.3);
+                marker.setOpacity(0.0);
             });
             
             // Show only matching markers
