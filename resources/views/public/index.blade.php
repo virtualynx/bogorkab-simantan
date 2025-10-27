@@ -80,26 +80,51 @@
         }
 
         .sidebar-container {
-            position: absolute;
-            top: 50px;
-            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 20px;
             background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2);
             width: 320px;
             display: none;
             z-index: 1000;
+            overflow-y: auto;
         }
+
         .sidebar-container.open {
             display: block;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            z-index: 1001;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #f0f0f0;
         }
 
         #map {
             position: relative;
             z-index: 1;
-        }
-
-        #map.map-with-sidebar {
-            margin-left: 320px;
+            height: 500px;
+            width: 100%;
         }
 
         .search-container {
@@ -175,7 +200,7 @@
                         <div class="d-flex flex-column h-100">
                             <!-- Sidebar container to display marker information -->
                             <div id="sidebarContainer" class="sidebar-container">
-                                <button id="closeSidebarBtn" class="close-btn">&#8249;</button>
+                                <button id="closeSidebarBtn" class="close-btn" title="Tutup panel">×</button>
                                 <div id="sidebarContent" class="content">
                                     <!-- School info will be loaded here -->
                                 </div>
@@ -184,6 +209,7 @@
                                     #completionGaugeContainer {
                                         border-top: 1px solid #eee;
                                         padding-top: 15px;
+                                        margin-top: 15px;
                                     }
 
                                     #completionGauge {
@@ -191,7 +217,7 @@
                                         display: block;
                                     }
                                 </style>
-                                <div id="completionGaugeContainer" style="margin-top: 20px; text-align: center; display: none;">
+                                <div id="completionGaugeContainer" style="text-align: center; display: none;">
                                     <canvas id="completionGauge" width="200" height="120"></canvas>
                                     <div id="gaugeLabel" style="margin-top: 10px; font-weight: bold;"></div>
                                 </div>
@@ -238,6 +264,24 @@
                 document.getElementById('sidebarContainer').classList.remove('open');
             });
 
+            // Clear search button
+            $('#clearSearch').on('click', function() {
+                $('#schoolSearch').val('');
+                $(this).hide();
+                showAllMarkers();
+            });
+
+            // Show/hide clear button based on input
+            $('#schoolSearch').on('input', function() {
+                $('#clearSearch').toggle($(this).val().length > 0);
+            });
+
+            // Close sidebar when clicking close button
+            $('#closeSidebarBtn').on('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling to map
+                document.getElementById('sidebarContainer').classList.remove('open');
+            });
+            
             // Load school data
             $.ajax({
                 url: '{{ url("api/history/school/answered_list") }}',
@@ -271,23 +315,6 @@
                     console.error('AJAX Error', xhr.status, error);
                     alert('Gagal memuat data sekolah');
                 }
-            });
-
-            // Clear search button
-            $('#clearSearch').on('click', function() {
-                $('#schoolSearch').val('');
-                $(this).hide();
-                showAllMarkers();
-            });
-
-            // Show/hide clear button based on input
-            $('#schoolSearch').on('input', function() {
-                $('#clearSearch').toggle($(this).val().length > 0);
-            });
-
-            // Close sidebar when clicking close button
-            $('#closeSidebarBtn').on('click', function() {
-                document.getElementById('sidebarContainer').classList.remove('open');
             });
         });
 
@@ -419,7 +446,7 @@
                 <p><strong>Alamat:</strong> ${schoolData.address || 'N/A'}</p>
                 <p><strong>Akreditasi:</strong> ${schoolData.accreditation || 'N/A'}</p>
                 <div class="mt-3">
-                    <a href="/school/answers?school_id=${schoolData.school_id}" class="btn btn-primary btn-sm" target="_blank">
+                    <a href="{{ url('/school/answers') }}?school_id=${schoolData.school_id}" class="btn btn-primary btn-sm" target="_blank">
                         Lihat Laporan SPM
                     </a>
                 </div>
